@@ -1,0 +1,6 @@
+<wsService>
+    <wsServiceItem serviceKey="serviceKey"
+                   serviceClass="serviceClass"
+                   method="queryHome">
+    </wsServiceItem>
+</wsService>
