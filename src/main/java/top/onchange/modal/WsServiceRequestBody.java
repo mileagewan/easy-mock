@@ -16,11 +16,11 @@ public class WsServiceRequestBody {
     /**
      * 方法key
      */
-    private String serviceKey;
+    public String serviceKey;
 
     /**
      * 公共参数
      */
-    private String params;
+    public String params;
 
 }

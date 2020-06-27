@@ -1,6 +1,6 @@
 <wsService>
-    <wsServiceItem serviceKey="serviceKey"
-                   serviceClass="serviceClass"
-                   method="queryHome">
+    <wsServiceItem serviceKey="say"
+                   serviceClass="top.onchange.service.MyTest"
+                   method="say">
     </wsServiceItem>
 </wsService>

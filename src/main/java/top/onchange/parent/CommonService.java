@@ -1,5 +1,6 @@
 package top.onchange.parent;
 
+import com.google.gson.Gson;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,16 +8,19 @@ import org.springframework.web.bind.annotation.*;
 import top.onchange.modal.WsService;
 import top.onchange.modal.WsServiceItem;
 import top.onchange.modal.WsServiceRequestBody;
-import top.onchange.modal.WsServiceRespone;
+import top.onchange.modal.WsServiceResponse;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 import static org.springframework.util.ResourceUtils.*;
 
@@ -59,10 +63,28 @@ public class CommonService {
     }
 
     @PostMapping("/service")
-    public WsServiceRespone  query(@RequestBody WsServiceRequestBody wsServiceRequestBody) {
+    public WsServiceResponse query(@RequestBody WsServiceRequestBody wsServiceRequestBody)
+            throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
+        Gson gson = new Gson();
+        String serviceKey = wsServiceRequestBody.serviceKey;
+        WsServiceResponse wsServiceResponse = new WsServiceResponse();
+        logger.info(gson.toJson(wsServiceRequestBody));
+        if (!mapService.containsKey(serviceKey)) {
+            wsServiceResponse.setServiceKey(serviceKey);
+            wsServiceResponse.setReturnData("");
+            wsServiceResponse.setSuccess(false);
+            wsServiceResponse.setErrorMsg(String.format("the %s serviceKey was not found, please try again with other key", serviceKey));
+        }
 
-
-        WsServiceRespone wsServiceRespone = new WsServiceRespone();
-        return wsServiceRespone;
+        WsServiceItem wsServiceItem = mapService.get(serviceKey);
+        Class queryClass = Class.forName(wsServiceItem.serviceClass);
+        Object queryObject = queryClass.newInstance();
+        Method method = queryClass.getMethod(wsServiceItem.method, String.class);
+        String response = (String) method.invoke(queryObject, wsServiceRequestBody.params);
+        wsServiceResponse.setReturnData(response);
+        wsServiceResponse.setSuccess(true);
+        wsServiceResponse.setErrorMsg(null);
+        logger.info(gson.toJson(wsServiceResponse));
+        return wsServiceResponse;
     }
 }
