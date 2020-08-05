@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.*;
 import top.onchange.modal.WsService;
 import top.onchange.modal.WsServiceItem;
@@ -31,14 +32,12 @@ public class CommonService {
     private static final Logger logger = LoggerFactory.getLogger(CommonService.class);
 
     //    private static String xmlPath = "H:\\Users\\wlc\\Desktop\\GitHub仓库\\easy-mock\\src\\main\\resources\\serviceConfig\\wsService.xml";
-    private static File xmlPath;
+    private static ClassPathResource  xmlPath;
 
     static {
-        try {
-            xmlPath = getFile(CLASSPATH_URL_PREFIX + "serviceConfig" + File.separator + "wsService.xml");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        //            xmlPath = getFile(CLASSPATH_URL_PREFIX + "serviceConfig" + File.separator + "wsService.xml");
+        xmlPath = new ClassPathResource("serviceConfig" + File.separator + "wsService.xml");
+
     }
 
     private static List<WsServiceItem> listService = new ArrayList<>();
@@ -50,14 +49,17 @@ public class CommonService {
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(WsService.class);
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            InputStreamReader isr = new InputStreamReader(new FileInputStream(xmlPath), "utf-8");
+            InputStreamReader isr = new InputStreamReader(xmlPath.getInputStream(), "utf-8");
             WsService wsService = (WsService) unmarshaller.unmarshal(isr);
             listService = wsService.wsServiceItem;
             for (WsServiceItem wsServiceItem : listService) {
                 mapService.put(wsServiceItem.serviceKey, wsServiceItem);
             }
             logger.info(String.format("class is load %s", listService));
+            logger.info(String.format("class is load %s", listService));
         } catch (JAXBException | FileNotFoundException | UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
