@@ -19,4 +19,6 @@ spring:
       min-idle: 5
       initial-size: 5
 
-
+mybatis:
+  config-location: classpath:mybatis/mybatisConfig.xml
+  mapper-locations: classpath:mybatis/mapper/*.xml
